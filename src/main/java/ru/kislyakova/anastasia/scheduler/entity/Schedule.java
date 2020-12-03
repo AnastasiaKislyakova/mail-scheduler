@@ -6,29 +6,27 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Data
-@Entity
-@Table(name = "schedules")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Embeddable
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = true)
-    private LocalDate from;
+    private LocalDateTime from;
 
     @Column(nullable = true)
-    private LocalDate to;
+    private LocalDateTime to;
 
     private Duration duration;
 
-    public Schedule(LocalDate from, LocalDate to, Duration duration) {
+    public Schedule(LocalDateTime from, LocalDateTime to, Duration duration) {
         this.from = from;
         this.to = to;
         this.duration = duration;

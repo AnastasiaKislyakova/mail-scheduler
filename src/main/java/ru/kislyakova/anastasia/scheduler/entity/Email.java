@@ -2,6 +2,7 @@ package ru.kislyakova.anastasia.scheduler.entity;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import ru.kislyakova.anastasia.scheduler.dto.EmailCreationDto;
 
 import javax.persistence.*;
 
@@ -17,16 +18,16 @@ public class Email {
 
     private String recipient;
 
-    private String title;
+    private String subject;
 
     private String text;
 
     private EmailStatus status;
 
-    public Email(String recipient, String title, String text, EmailStatus status) {
-        this.recipient = recipient;
-        this.title = title;
-        this.text = text;
-        this.status = status;
+    public Email(EmailCreationDto emailDto) {
+        this.recipient = emailDto.getRecipient();
+        this.subject = emailDto.getSubject();
+        this.text = emailDto.getText();
+        this.status = emailDto.getStatus();
     }
 }
