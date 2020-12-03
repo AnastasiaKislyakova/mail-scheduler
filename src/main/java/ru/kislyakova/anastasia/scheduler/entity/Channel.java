@@ -28,7 +28,7 @@ public class Channel {
             name="channel_recipients",
             joinColumns=@JoinColumn(name="channel_id")
     )
-    @Column(name="recipients")
+    @Column(name="recipient_address")
     private List<String> recipients;
 
     public Channel(ChannelCreationDto channel) {

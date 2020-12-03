@@ -14,14 +14,10 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Embeddable
 public class Schedule {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(nullable = true)
+    @Column(name = "from_time", nullable = true)
     private LocalDateTime from;
 
-    @Column(nullable = true)
+    @Column(name = "to_time", nullable = true)
     private LocalDateTime to;
 
     private Duration duration;

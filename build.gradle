@@ -24,7 +24,7 @@ dependencies {
 	compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.9'
 
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.3.5.RELEASE'
-
+	runtime 'org.postgresql:postgresql:42.2.5'
 
 }
 
