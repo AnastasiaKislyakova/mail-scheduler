@@ -3,17 +3,21 @@ package ru.kislyakova.anastasia.scheduler.entity;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @Data
-@Entity
-@Table(name = "channels")
+@NoArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Entity
+@Table(name = "channels")
 public class Channel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -23,7 +27,7 @@ public class Channel {
 
     private String description;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name="channel_recipients",
             joinColumns=@JoinColumn(name="channel_id")

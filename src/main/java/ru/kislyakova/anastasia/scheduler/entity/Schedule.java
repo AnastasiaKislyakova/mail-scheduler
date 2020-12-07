@@ -3,6 +3,7 @@ package ru.kislyakova.anastasia.scheduler.entity;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Duration;
@@ -10,9 +11,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Data
+@NoArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Embeddable
+//@Embeddable
 public class Schedule {
     @Column(name = "from_time", nullable = true)
     private LocalDateTime from;

@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scheduler?stringtype=unspecified
+    username: postgres
+    password: mysecretpassword
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: scheduler
+
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
+
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: 40c56502e13d5f
+    password: f9a099cfb7af8d
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    default-schema: scheduler

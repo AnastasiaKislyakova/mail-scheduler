@@ -1,5 +1,7 @@
 package ru.kislyakova.anastasia.scheduler.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Service
 public class ChannelServiceImpl implements ChannelService {
+    private static final Logger logger = LoggerFactory.getLogger(ChannelServiceImpl.class);
 
     private ChannelRepository channelRepository;
 
@@ -23,7 +26,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public Channel createChannel(ChannelCreationDto channelCreationDto) {
         Channel channel = new Channel(channelCreationDto);
-        channelRepository.save(channel);
+        channel = channelRepository.save(channel);
         return channel;
     }
 

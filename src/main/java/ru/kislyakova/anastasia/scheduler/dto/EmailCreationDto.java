@@ -16,4 +16,10 @@ public class EmailCreationDto {
 
     @NotNull
     private EmailStatus status = EmailStatus.CREATED;
+
+    public EmailCreationDto(String recipient, String subject, String text) {
+        this.recipient = recipient;
+        this.subject = subject;
+        this.text = text;
+    }
 }

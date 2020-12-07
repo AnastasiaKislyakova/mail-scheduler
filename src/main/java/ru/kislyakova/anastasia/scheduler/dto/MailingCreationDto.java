@@ -13,5 +13,5 @@ public class MailingCreationDto {
 
     private String text;
 
-    private Schedule schedule;
+   // private Schedule schedule;
 }
