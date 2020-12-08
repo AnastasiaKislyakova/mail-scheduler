@@ -25,8 +25,10 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Channel createChannel(ChannelCreationDto channelCreationDto) {
+        logger.info("Creating channel {}", channelCreationDto.getName());
         Channel channel = new Channel(channelCreationDto);
         channel = channelRepository.save(channel);
+        logger.info("Created channel {}", channelCreationDto.getName());
         return channel;
     }
 

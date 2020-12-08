@@ -24,5 +24,6 @@ spring:
     password: f9a099cfb7af8d
 
   liquibase:
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    change-log: classpath:/db.changelog/db.changelog-master.yaml
     default-schema: scheduler
+    enabled: true

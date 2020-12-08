@@ -1,5 +1,7 @@
 package ru.kislyakova.anastasia.scheduler.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Service
 public class MailingServiceImpl implements MailingService {
+    private static final Logger logger = LoggerFactory.getLogger(MailingServiceImpl.class);
+
     private MailingRepository mailingRepository;
     private ChannelService channelService;
     private EmailService emailService;

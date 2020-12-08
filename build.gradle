@@ -30,8 +30,8 @@ dependencies {
 	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
 	// https://mvnrepository.com/artifact/javax.validation/validation-api
 	compile group: 'javax.validation', name: 'validation-api', version: '2.0.0.Final'
-// https://mvnrepository.com/artifact/org.liquibase/liquibase-core
-//	compile group: 'org.liquibase', name: 'liquibase-core', version: '4.2.1'
+ //https://mvnrepository.com/artifact/org.liquibase/liquibase-core
+	compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.9'
 
 
 
