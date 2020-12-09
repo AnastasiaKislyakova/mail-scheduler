@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import ru.kislyakova.anastasia.scheduler.config.EmailCfg;
@@ -24,7 +25,7 @@ public class EmailServiceImpl implements EmailService {
     private EmailCfg emailCfg;
 
     @Autowired
-    public EmailServiceImpl(EmailRepository emailRepository, EmailCfg emailCfg) {
+    public EmailServiceImpl(EmailRepository emailRepository, EmailCfg emailCfg, JavaMailSender mailSender) {
         this.emailRepository = emailRepository;
         this.emailCfg = emailCfg;
     }
@@ -46,14 +47,14 @@ public class EmailServiceImpl implements EmailService {
         mailMessage.setSubject(email.getSubject());
         mailMessage.setText(email.getText());
 
-        try {
+        //try {
             mailSender.send(mailMessage);
             email.setStatus(EmailStatus.SENT);
             emailRepository.save(email);
-        }
-        catch(MailException ex) {
-            logger.error("Couldn't send email, caused by MailException : {}", ex.getMessage());
-        }
+//        }
+//        catch(MailException ex) {
+//            logger.error("Couldn't send email, caused by MailException : {}", ex.getMessage());
+//        }
 
         return email;
     }

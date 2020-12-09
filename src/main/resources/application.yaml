@@ -27,3 +27,7 @@ spring:
     change-log: classpath:/db.changelog/db.changelog-master.yaml
     default-schema: scheduler
     enabled: true
+
+server:
+  error:
+    include-message: always

@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS scheduler;
 CREATE TABLE IF NOT EXISTS scheduler.channels
 (
     id           SERIAL PRIMARY KEY,
-    name         VARCHAR(100) NOT NULL,
+    name         VARCHAR(100) UNIQUE NOT NULL,
     description  VARCHAR(140) NOT NULL
 );
 

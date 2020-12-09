@@ -22,7 +22,7 @@ public class Channel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-   // @Column(name="name", unique = true)
+    @Column(name="name", unique = true)
     private String name;
 
     private String description;

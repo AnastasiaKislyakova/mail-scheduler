@@ -1,5 +1,6 @@
 package ru.kislyakova.anastasia.scheduler.service.impl;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
+import ru.kislyakova.anastasia.scheduler.exception.DuplicateChannelException;
 import ru.kislyakova.anastasia.scheduler.repository.ChannelRepository;
 import ru.kislyakova.anastasia.scheduler.service.ChannelService;
 
@@ -25,10 +27,19 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Channel createChannel(ChannelCreationDto channelCreationDto) {
-        logger.info("Creating channel {}", channelCreationDto.getName());
+      //  logger.info("Creating channel {}", channelCreationDto.getName());
         Channel channel = new Channel(channelCreationDto);
-        channel = channelRepository.save(channel);
-        logger.info("Created channel {}", channelCreationDto.getName());
+        try {
+            channel = channelRepository.save(channel);
+          //  logger.info("Created channel {}", channelCreationDto.getName());
+        } catch (Exception ex) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+             //   logger.error("Couldn't create channel, caused by {}", ex.getMessage());
+                throw new DuplicateChannelException(channelCreationDto.getName());
+            } else {
+                throw ex;
+            }
+        }
         return channel;
     }
 
@@ -39,7 +50,9 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Channel getChannelById(int channelId) {
-        return channelRepository.findById(channelId).orElse(null);
+        Channel channel = channelRepository.findById(channelId).orElse(null);
+
+        return channel;
     }
 
     @Override

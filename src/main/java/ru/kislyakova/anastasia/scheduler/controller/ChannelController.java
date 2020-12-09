@@ -1,8 +1,10 @@
 package ru.kislyakova.anastasia.scheduler.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
@@ -21,8 +23,16 @@ public class ChannelController {
     }
 
     @PostMapping
-    Channel createChannel(@RequestBody ChannelCreationDto itemCreationDto) {
-        return channelService.createChannel(itemCreationDto);
+    public Mono<ResponseEntity<Channel>> createChannel(@RequestBody ChannelCreationDto itemCreationDto) {
+        return Mono.subscriberContext().map((context) -> {
+            Channel channel = channelService.createChannel(itemCreationDto);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+        });
     }
 
     @PutMapping(value = "{channelId}")
