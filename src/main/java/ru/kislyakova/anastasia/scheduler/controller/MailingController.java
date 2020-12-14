@@ -7,6 +7,7 @@ import ru.kislyakova.anastasia.scheduler.dto.MailingCreationDto;
 import ru.kislyakova.anastasia.scheduler.entity.Mailing;
 import ru.kislyakova.anastasia.scheduler.service.MailingService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,7 +21,7 @@ public class MailingController {
     }
 
     @PostMapping
-    Mailing createMailing(@RequestBody MailingCreationDto mailingCreationDto) {
+    Mailing createMailing(@RequestBody @Valid MailingCreationDto mailingCreationDto) {
         return mailingService.createMailing(mailingCreationDto);
     }
 

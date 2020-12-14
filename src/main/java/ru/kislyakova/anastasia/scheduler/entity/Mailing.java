@@ -25,6 +25,8 @@ public class Mailing {
 
     private String text;
 
+    private int attempt = 0;
+
 //    @Embedded
 //    private Schedule schedule;
 

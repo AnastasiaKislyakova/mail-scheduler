@@ -16,6 +16,7 @@ import ru.kislyakova.anastasia.scheduler.repository.EmailRepository;
 import ru.kislyakova.anastasia.scheduler.service.EmailService;
 
 import java.util.List;
+import java.util.Properties;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -23,15 +24,17 @@ public class EmailServiceImpl implements EmailService {
 
     private EmailRepository emailRepository;
     private EmailCfg emailCfg;
+   // private JavaMailSender mailSender;
 
     @Autowired
     public EmailServiceImpl(EmailRepository emailRepository, EmailCfg emailCfg, JavaMailSender mailSender) {
         this.emailRepository = emailRepository;
         this.emailCfg = emailCfg;
+       // this.mailSender = mailSender;
     }
 
     @Override
-    public Email createEmail(EmailCreationDto emailDto) {
+    public Email sendEmail(EmailCreationDto emailDto) {
         Email email = new Email(emailDto);
         emailRepository.save(email);
 
@@ -40,6 +43,15 @@ public class EmailServiceImpl implements EmailService {
         mailSender.setPort(this.emailCfg.getPort());
         mailSender.setUsername(this.emailCfg.getUsername());
         mailSender.setPassword(this.emailCfg.getPassword());
+
+        Properties props = mailSender.getJavaMailProperties();
+//        props.put("mail.transport.protocol", this.emailCfg.getTransportProtocol());
+//        props.put("mail.smtp.auth", this.emailCfg.getAuth());
+//        props.put("mail.smtp.starttls.enable", this.emailCfg.getStarttlsEnable());
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        mailSender.setJavaMailProperties(props);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(this.emailCfg.getUsername());
@@ -57,11 +69,6 @@ public class EmailServiceImpl implements EmailService {
 //        }
 
         return email;
-    }
-
-    @Override
-    public Email sendEmail(int EmailId) {
-        return null;
     }
 
     @Override

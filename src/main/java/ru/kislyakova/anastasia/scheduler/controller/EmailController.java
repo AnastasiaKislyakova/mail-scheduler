@@ -21,17 +21,8 @@ public class EmailController {
 
     @PostMapping
     Email sendEmail(@RequestBody EmailCreationDto emailCreationDto) {
-        return emailService.createEmail(emailCreationDto);
+        return emailService.sendEmail(emailCreationDto);
     }
-
-//    @PostMapping(value = "{mailingId}/send")
-//    ResponseEntity<Email> sendEmail(@PathVariable int emailId) {
-//        Email emailById = emailService.sendEmail(emailId);
-//        if (emailById == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok(emailById);
-//    }
 
     @GetMapping
     List<Email> getEmails() {

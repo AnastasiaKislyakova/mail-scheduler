@@ -6,8 +6,12 @@ import lombok.Data;
 import ru.kislyakova.anastasia.scheduler.entity.EmailStatus;
 
 @Data
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+//@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class EmailCreationDto {
+    private Integer mailingId;
+
+    private Integer mailingAttempt;
+
     private String recipient;
 
     private String subject;
@@ -17,7 +21,10 @@ public class EmailCreationDto {
     @NotNull
     private EmailStatus status = EmailStatus.CREATED;
 
-    public EmailCreationDto(String recipient, String subject, String text) {
+    public EmailCreationDto(Integer mailingId, Integer mailingAttempt, String recipient,
+                            String subject, String text) {
+        this.mailingId = mailingId;
+        this.mailingAttempt = mailingAttempt;
         this.recipient = recipient;
         this.subject = subject;
         this.text = text;

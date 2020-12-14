@@ -4,6 +4,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
@@ -16,7 +18,6 @@ import java.util.List;
 
 @Service
 public class ChannelServiceImpl implements ChannelService {
-    private static final Logger logger = LoggerFactory.getLogger(ChannelServiceImpl.class);
 
     private ChannelRepository channelRepository;
 
@@ -25,16 +26,14 @@ public class ChannelServiceImpl implements ChannelService {
         this.channelRepository = channelRepository;
     }
 
+    @Cacheable(value = "channels")
     @Override
     public Channel createChannel(ChannelCreationDto channelCreationDto) {
-      //  logger.info("Creating channel {}", channelCreationDto.getName());
         Channel channel = new Channel(channelCreationDto);
         try {
             channel = channelRepository.save(channel);
-          //  logger.info("Created channel {}", channelCreationDto.getName());
         } catch (Exception ex) {
             if (ex.getCause() instanceof ConstraintViolationException) {
-             //   logger.error("Couldn't create channel, caused by {}", ex.getMessage());
                 throw new DuplicateChannelException(channelCreationDto.getName());
             } else {
                 throw ex;
@@ -48,6 +47,7 @@ public class ChannelServiceImpl implements ChannelService {
         return channelRepository.findAll();
     }
 
+    @Cacheable(value = "channels")
     @Override
     public Channel getChannelById(int channelId) {
         Channel channel = channelRepository.findById(channelId).orElse(null);
@@ -55,6 +55,7 @@ public class ChannelServiceImpl implements ChannelService {
         return channel;
     }
 
+    @CachePut(value = "channels", key = "#channelId")
     @Override
     public Channel updateChannel(int channelId, ChannelUpdatingDto channelDto) {
         Channel channel = channelRepository.findById(channelId)

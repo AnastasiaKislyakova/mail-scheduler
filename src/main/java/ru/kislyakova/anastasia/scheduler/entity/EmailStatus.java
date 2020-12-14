@@ -8,5 +8,7 @@ public enum EmailStatus {
     @JsonProperty("Sent")
     SENT,
     @JsonProperty("Received")
-    RECEIVED
+    RECEIVED,
+    @JsonProperty("Error")
+    ERROR
 }

@@ -1,4 +1,5 @@
 package ru.kislyakova.anastasia.scheduler.entity;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -18,6 +19,12 @@ public class Email {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name="mailing_id", nullable = true)
+    private Integer mailingId;
+
+    @Column(name="mailing_attempt", nullable = true)
+    private Integer mailingAttempt;
+
     @javax.validation.constraints.Email
     private String recipient;
 
@@ -29,6 +36,8 @@ public class Email {
     private EmailStatus status = EmailStatus.CREATED;
 
     public Email(EmailCreationDto emailDto) {
+        this.mailingId = emailDto.getMailingId();
+        this.mailingAttempt = emailDto.getMailingAttempt();
         this.recipient = emailDto.getRecipient();
         this.subject = emailDto.getSubject();
         this.text = emailDto.getText();

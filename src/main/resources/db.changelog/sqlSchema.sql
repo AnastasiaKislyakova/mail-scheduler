@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS scheduler.mailings
     channel_id   SERIAL REFERENCES scheduler.channels (id),
     subject      VARCHAR(100) NOT NULL,
     text         VARCHAR NOT NULL,
+    attempt      INT NULL,
     from_time    TIMESTAMP NULL,
     to_time      TIMESTAMP NULL,
     duration     INTERVAL NULL
@@ -28,8 +29,11 @@ CREATE TABLE IF NOT EXISTS scheduler.mailings
 CREATE TABLE IF NOT EXISTS scheduler.emails
 (
     id        SERIAL PRIMARY KEY,
+    mailing_id INT NULL,
+    mailing_attempt INT NULL,
     recipient VARCHAR(100) NOT NULL,
     subject   VARCHAR(100) NULL,
-    text      VARCHAR      NOT NULL,
-    status    VARCHAR(25) NOT NULL
+    text      VARCHAR    NOT NULL,
+    status    VARCHAR(25) NOT NULL,
+    UNIQUE (mailing_id, mailing_attempt, recipient)
 );

@@ -16,12 +16,21 @@ spring:
   jackson:
     serialization:
       write_dates_as_timestamps: false
+    default-property-inclusion: non_null
 
   mail:
-    host: smtp.mailtrap.io
-    port: 2525
-    username: 40c56502e13d5f
-    password: f9a099cfb7af8d
+    host: smtp.gmail.com
+    port: 587
+    username: user
+    password: pass
+    protocol: smtp
+
+    properties.mail:
+      transport.protocol: smtp
+      smtp:
+        auth: true
+        starttls.enable: true
+        ssl.trust: smtp.gmail.com
 
   liquibase:
     change-log: classpath:/db.changelog/db.changelog-master.yaml

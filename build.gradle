@@ -14,27 +14,30 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	//implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	runtime 'org.postgresql:postgresql:42.2.5'
+
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.9'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	implementation 'javax.validation:validation-api'
+	implementation 'org.liquibase:liquibase-core'
+
+	implementation 'org.hibernate:hibernate-validator:6.0.10.Final'
+	implementation 'org.glassfish:javax.el:3.0.1-b10'
+
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.9'
-
-	compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.3.5.RELEASE'
-	runtime 'org.postgresql:postgresql:42.2.5'
-	compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.3'
-	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.11.3'
-	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
-	// https://mvnrepository.com/artifact/javax.validation/validation-api
-	compile group: 'javax.validation', name: 'validation-api', version: '2.0.0.Final'
- //https://mvnrepository.com/artifact/org.liquibase/liquibase-core
-	compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.9'
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-webflux
-	compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '2.3.5.RELEASE'
-
 
 }
 

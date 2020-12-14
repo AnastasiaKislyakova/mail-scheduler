@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ChannelUpdatingDto {
+
     private String description;
 
     private List<String> recipients;

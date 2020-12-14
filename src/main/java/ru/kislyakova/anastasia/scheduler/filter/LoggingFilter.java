@@ -3,6 +3,7 @@ package ru.kislyakova.anastasia.scheduler.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,15 @@ public class LoggingFilter implements WebFilter {
 
         return chain.filter(exchange)
                 .doOnSuccess((it) -> {
-                    logger.info("{}: {} {} {}", method, path, queryParams, response.getStatusCode());
+                    HttpStatus statusCode = response.getStatusCode();
+                    String logMessage = String.format("%s: %s %s %s", method, path, queryParams, statusCode);
+                    if (statusCode != null && statusCode.is2xxSuccessful()) {
+                        logger.info(logMessage);
+                    } else if (statusCode != null && statusCode.is4xxClientError()){
+                        logger.warn(logMessage);
+                    } else {
+                        logger.error(logMessage);
+                    }
                 })
                 .doOnError((ex) -> {
                     logger.error("{}: {} {} {} finished with error", method, path, queryParams,

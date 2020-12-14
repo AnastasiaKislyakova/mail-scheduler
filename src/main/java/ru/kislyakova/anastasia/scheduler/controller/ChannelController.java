@@ -10,6 +10,7 @@ import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
 import ru.kislyakova.anastasia.scheduler.service.ChannelService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,14 +24,9 @@ public class ChannelController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Channel>> createChannel(@RequestBody ChannelCreationDto itemCreationDto) {
+    public Mono<ResponseEntity<Channel>> createChannel(@RequestBody @Valid ChannelCreationDto itemCreationDto) {
         return Mono.subscriberContext().map((context) -> {
             Channel channel = channelService.createChannel(itemCreationDto);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             return ResponseEntity.status(HttpStatus.CREATED).body(channel);
         });
     }
