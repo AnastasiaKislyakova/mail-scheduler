@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
@@ -32,12 +33,8 @@ public class ChannelServiceImpl implements ChannelService {
         Channel channel = new Channel(channelCreationDto);
         try {
             channel = channelRepository.save(channel);
-        } catch (Exception ex) {
-            if (ex.getCause() instanceof ConstraintViolationException) {
-                throw new DuplicateChannelException(channelCreationDto.getName());
-            } else {
-                throw ex;
-            }
+        } catch (DataIntegrityViolationException ex) {
+            throw new DuplicateChannelException(channelCreationDto.getName());
         }
         return channel;
     }

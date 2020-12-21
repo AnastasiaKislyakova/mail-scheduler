@@ -9,19 +9,23 @@ import org.springframework.mail.MailSendException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.kislyakova.anastasia.scheduler.TeaTimeMailing;
+import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.EmailCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.MailingCreationDto;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
 import ru.kislyakova.anastasia.scheduler.entity.Email;
 import ru.kislyakova.anastasia.scheduler.entity.Mailing;
+import ru.kislyakova.anastasia.scheduler.exception.ChannelNotFoundException;
 import ru.kislyakova.anastasia.scheduler.repository.MailingRepository;
 import ru.kislyakova.anastasia.scheduler.service.ChannelService;
 import ru.kislyakova.anastasia.scheduler.service.EmailService;
 import ru.kislyakova.anastasia.scheduler.service.MailingService;
 
 import javax.mail.SendFailedException;
+import javax.validation.constraints.Min;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,9 +49,13 @@ public class MailingServiceImpl implements MailingService {
     public Mailing createMailing(MailingCreationDto mailingDto) {
         Mailing mailing = new Mailing(mailingDto);
 
-        //Add channelId validation
+        int channelId = mailingDto.getChannelId();
+        Channel channelById = channelService.getChannelById(channelId);
+        if (channelById == null) {
+            throw new ChannelNotFoundException(channelId);
+        }
 
-        mailingRepository.save(mailing);
+        mailing = mailingRepository.save(mailing);
         return mailing;
     }
 
@@ -60,7 +68,7 @@ public class MailingServiceImpl implements MailingService {
 
         mailing.setAttempt(mailing.getAttempt() + 1);
         sendEmails(mailing);
-        mailingRepository.save(mailing);
+        mailing = mailingRepository.save(mailing);
         return mailing;
     }
 
@@ -69,7 +77,9 @@ public class MailingServiceImpl implements MailingService {
     private void sendScheduledEmails() {
         boolean sent = false;
         do {
-            Mailing mailing = mailingRepository.findById(TeaTimeMailing.getMailingId()).orElse(null);
+            //TODO: think about TeaTimeMailing
+          //  Mailing mailing = mailingRepository.findById(TeaTimeMailing.getMailingId()).orElse(null);
+            Mailing mailing = mailingRepository.findById(1).orElse(null);
             if (mailing == null) return;
             try {
                 mailing.setAttempt(mailing.getAttempt() + 1);
@@ -84,7 +94,12 @@ public class MailingServiceImpl implements MailingService {
     }
 
     private void sendEmails(Mailing mailing) {
-        Channel channel = channelService.getChannelById(mailing.getChannelId());
+        int channelId = mailing.getChannelId();
+        Channel channel = channelService.getChannelById(channelId);
+        if (channel == null) {
+            throw new ChannelNotFoundException(channelId);
+        }
+
         List<String> emails = channel.getRecipients();
         String subject = mailing.getSubject();
         String text = mailing.getText();

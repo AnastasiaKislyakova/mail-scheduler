@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ChannelRepository extends CrudRepository<Channel, Integer> {

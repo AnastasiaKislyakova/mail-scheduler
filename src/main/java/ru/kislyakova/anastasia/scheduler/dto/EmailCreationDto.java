@@ -3,9 +3,11 @@ package ru.kislyakova.anastasia.scheduler.dto;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.sun.istack.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.kislyakova.anastasia.scheduler.entity.EmailStatus;
 
 @Data
+@NoArgsConstructor
 //@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class EmailCreationDto {
     private Integer mailingId;

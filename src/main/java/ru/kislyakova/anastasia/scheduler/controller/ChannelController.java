@@ -23,12 +23,18 @@ public class ChannelController {
         this.channelService = channelService;
     }
 
+//    @PostMapping
+//    public Mono<ResponseEntity<Channel>> createChannel(@RequestBody @Valid ChannelCreationDto itemCreationDto) {
+//        return Mono.subscriberContext().map((context) -> {
+//            Channel channel = channelService.createChannel(itemCreationDto);
+//            return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+//        });
+//    }
+
     @PostMapping
-    public Mono<ResponseEntity<Channel>> createChannel(@RequestBody @Valid ChannelCreationDto itemCreationDto) {
-        return Mono.subscriberContext().map((context) -> {
-            Channel channel = channelService.createChannel(itemCreationDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(channel);
-        });
+    public ResponseEntity<Channel> createChannel(@RequestBody @Valid ChannelCreationDto itemCreationDto) {
+        Channel channel = channelService.createChannel(itemCreationDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @PutMapping(value = "{channelId}")
@@ -50,8 +56,8 @@ public class ChannelController {
     }
 
     @GetMapping
-    List<Channel> getChannels() {
-        return channelService.getChannels();
+    ResponseEntity<List<Channel>> getChannels() {
+        return ResponseEntity.ok(channelService.getChannels());
     }
 
 

@@ -20,16 +20,16 @@ public class EmailController {
     }
 
     @PostMapping
-    Email sendEmail(@RequestBody EmailCreationDto emailCreationDto) {
-        return emailService.sendEmail(emailCreationDto);
+    ResponseEntity<Email> sendEmail(@RequestBody EmailCreationDto emailCreationDto) {
+        return ResponseEntity.ok(emailService.sendEmail(emailCreationDto));
     }
 
     @GetMapping
-    List<Email> getEmails() {
-        return emailService.getEmails();
+    ResponseEntity<List<Email>> getEmails() {
+        return ResponseEntity.ok(emailService.getEmails());
     }
 
-    @GetMapping(value = "{mailingId}")
+    @GetMapping(value = "{emailId}")
     ResponseEntity<Email> getEmailById(@PathVariable int emailId) {
         Email emailById = emailService.getEmailById(emailId);
         if (emailById == null) {

@@ -1,0 +1,21 @@
+version: '3'
+services:
+  app:
+    image: 'scheduler:0.0.4-SNAPSHOT'
+    ports:
+      - "8080:8080"
+    build:
+      context: ./build/docker
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/scheduler?stringtype=unspecified
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=mysecretpassword
+  db:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=scheduler

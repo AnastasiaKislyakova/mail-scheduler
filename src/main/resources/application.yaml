@@ -34,9 +34,12 @@ spring:
 
   liquibase:
     change-log: classpath:/db.changelog/db.changelog-master.yaml
-    default-schema: scheduler
     enabled: true
 
 server:
   error:
     include-message: always
+
+logging:
+  file:
+    name: scheduler.log

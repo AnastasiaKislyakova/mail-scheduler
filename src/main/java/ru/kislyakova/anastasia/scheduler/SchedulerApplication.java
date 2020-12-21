@@ -18,21 +18,21 @@ import java.util.Locale;
 @EnableScheduling
 @EnableCaching
 @SpringBootApplication
-public class SchedulerApplication implements CommandLineRunner {
+public class SchedulerApplication {
 
-	private final ChannelRepository channelRepository;
+//	private final ChannelRepository channelRepository;
+//
+//	private final MailingRepository mailingRepository;
+//
+//	public SchedulerApplication(ChannelRepository channelRepository, MailingRepository mailingRepository) {
+//		this.channelRepository = channelRepository;
+//		this.mailingRepository = mailingRepository;
+//	}
 
-	private final MailingRepository mailingRepository;
-
-	public SchedulerApplication(ChannelRepository channelRepository, MailingRepository mailingRepository) {
-		this.channelRepository = channelRepository;
-		this.mailingRepository = mailingRepository;
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-		TeaTimeMailing.create(channelRepository, mailingRepository);
-	}
+//	@Override
+//	public void run(String... args) throws Exception {
+//		TeaTimeMailing.create(channelRepository, mailingRepository);
+//	}
 
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.US);

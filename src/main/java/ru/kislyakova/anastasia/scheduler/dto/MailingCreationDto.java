@@ -3,6 +3,7 @@ package ru.kislyakova.anastasia.scheduler.dto;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.kislyakova.anastasia.scheduler.entity.Schedule;
 
 import javax.validation.constraints.Min;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonAutoDetect
 public class MailingCreationDto {
 

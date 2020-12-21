@@ -1,6 +1,7 @@
 package ru.kislyakova.anastasia.scheduler.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.kislyakova.anastasia.scheduler.dto.MailingCreationDto;
@@ -21,8 +22,8 @@ public class MailingController {
     }
 
     @PostMapping
-    Mailing createMailing(@RequestBody @Valid MailingCreationDto mailingCreationDto) {
-        return mailingService.createMailing(mailingCreationDto);
+    ResponseEntity<Mailing> createMailing(@RequestBody @Valid MailingCreationDto mailingCreationDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(mailingService.createMailing(mailingCreationDto));
     }
 
     @PostMapping(value = "{mailingId}/send")

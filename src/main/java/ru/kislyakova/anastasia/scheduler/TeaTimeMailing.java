@@ -5,20 +5,18 @@ import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.MailingCreationDto;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
 import ru.kislyakova.anastasia.scheduler.entity.Mailing;
-import ru.kislyakova.anastasia.scheduler.exception.DuplicateChannelException;
 import ru.kislyakova.anastasia.scheduler.repository.ChannelRepository;
 import ru.kislyakova.anastasia.scheduler.repository.MailingRepository;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class TeaTimeMailing {
     private static int MAILING_ID;
 
-    static void create(ChannelRepository channelRepository, MailingRepository mailingRepository) {
+    void create(ChannelRepository channelRepository, MailingRepository mailingRepository) {
         ChannelCreationDto channelDto = new ChannelCreationDto("Время чая", "Любители попить чай",
-                Arrays.asList("petrovvodkin.kuzma@gmail.com"));
+                Arrays.asList("anastasia.kislyakova@gmail.com", "petrovvodkin.kuzma@gmail.com"));
         Channel channel = new Channel(channelDto);
         try {
             channel = channelRepository.save(channel);
