@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql://localhost/test-db
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  mail:
+    password: test
+    username: test
+    host: localhost
+    port: 3025
+    protocol: smtp
+    test-connection: true

@@ -16,8 +16,11 @@ import ru.kislyakova.anastasia.scheduler.entity.EmailStatus;
 import ru.kislyakova.anastasia.scheduler.repository.EmailRepository;
 import ru.kislyakova.anastasia.scheduler.service.EmailService;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -61,6 +64,42 @@ public class EmailServiceImpl implements EmailService {
 //        }
 
         return email;
+    }
+
+    //TODO should add sendEmails ?
+    public List<Email> sendEmails(List<EmailCreationDto> emailDtos) {
+        List<SimpleMailMessage> messages = new ArrayList<>();
+        List<Email> emails = new ArrayList<>();
+        for (EmailCreationDto emailDto : emailDtos){
+            Email email = new Email(emailDto);
+            try {
+                email = emailRepository.save(email);
+            } catch (DataIntegrityViolationException ex) {
+                email = emailRepository.findByMailingIdAttemptAndRecipient(emailDto.getMailingId(),
+                        emailDto.getMailingAttempt(), emailDto.getRecipient());
+                if (email.getStatus() == EmailStatus.SENT) continue;
+            }
+
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setFrom(this.emailCfg.getUsername());
+            mailMessage.setTo(email.getRecipient());
+            mailMessage.setSubject(email.getSubject());
+            mailMessage.setText(email.getText());
+
+            messages.add(mailMessage);
+            emails.add(email);
+        }
+
+        SimpleMailMessage[] simpleMailMessages = new SimpleMailMessage[messages.size()];
+        messages.toArray(simpleMailMessages);
+        mailSender.send(simpleMailMessages);
+
+        for (Email email : emails) {
+            email.setStatus(EmailStatus.SENT);
+            emailRepository.save(email);
+        }
+
+        return emails;
     }
 
     @Override

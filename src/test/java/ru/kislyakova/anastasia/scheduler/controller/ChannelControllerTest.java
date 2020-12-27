@@ -4,7 +4,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,10 +18,11 @@ import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
 import ru.kislyakova.anastasia.scheduler.entity.Channel;
 import ru.kislyakova.anastasia.scheduler.exception.DuplicateChannelException;
 import ru.kislyakova.anastasia.scheduler.service.ChannelService;
+import ru.kislyakova.anastasia.scheduler.utils.EntityUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -39,8 +39,7 @@ class ChannelControllerTest {
 
     @Test
     void should_create_channel() {
-        ChannelCreationDto channelDto = new ChannelCreationDto("A", "channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
+        ChannelCreationDto channelDto = EntityUtils.channelCreationDto();
         Channel channel = new Channel(channelDto);
         channel.setId(1);
         when(channelService.createChannel(channelDto)).thenReturn(channel);
@@ -52,13 +51,12 @@ class ChannelControllerTest {
                 .exchange()
                 .expectStatus().isCreated();
 
-        Mockito.verify(channelService, times(1)).createChannel(channelDto);
+        verify(channelService, times(1)).createChannel(channelDto);
     }
 
     @Test
     void should_not_create_channel_with_existing_name() throws Exception {
-        ChannelCreationDto channelDto = new ChannelCreationDto("A", "channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
+        ChannelCreationDto channelDto = EntityUtils.channelCreationDto();
         Channel channel = new Channel(channelDto);
         DuplicateChannelException ex = new DuplicateChannelException(channel.getName());
         when(channelService.createChannel(channelDto)).thenThrow(ex);
@@ -70,15 +68,13 @@ class ChannelControllerTest {
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT);
 
-        Mockito.verify(channelService, times(1)).createChannel(channelDto);
+        verify(channelService, times(1)).createChannel(channelDto);
     }
 
     @Test
     void should_update_channel() {
-        ChannelUpdatingDto channelDto = new ChannelUpdatingDto("channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
-        ChannelCreationDto channelCreationDto = new ChannelCreationDto("A", "channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
+        ChannelUpdatingDto channelDto = EntityUtils.channelUpdatingDto();
+        ChannelCreationDto channelCreationDto = EntityUtils.channelCreationDto();
         Channel channel = new Channel(channelCreationDto);
         int id = 1;
         channel.setId(id);
@@ -92,15 +88,13 @@ class ChannelControllerTest {
                 .exchange()
                 .expectStatus().isOk();
 
-        Mockito.verify(channelService, times(1)).updateChannel(id, channelDto);
+        verify(channelService, times(1)).updateChannel(id, channelDto);
     }
 
     @Test
     void should_not_update_channel_with_not_found_id() {
-        ChannelUpdatingDto channelDto = new ChannelUpdatingDto("channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
-        ChannelCreationDto channelCreationDto = new ChannelCreationDto("A", "channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
+        ChannelUpdatingDto channelDto = EntityUtils.channelUpdatingDto();
+        ChannelCreationDto channelCreationDto = EntityUtils.channelCreationDto();
         Channel channel = new Channel(channelCreationDto);
         int id = 1;
         channel.setId(id);
@@ -114,14 +108,13 @@ class ChannelControllerTest {
                 .exchange()
                 .expectStatus().isNotFound();
 
-        Mockito.verify(channelService, times(1)).updateChannel(id, channelDto);
+        verify(channelService, times(1)).updateChannel(id, channelDto);
     }
 
     @Test
     void should_get_channel_by_id() {
-        List<String> recipients = Arrays.asList("ab@gmail.com", "abc@gmail.com");
-        ChannelCreationDto channelCreationDto = new ChannelCreationDto("A", "channel A", recipients);
-        Channel channel = new Channel(channelCreationDto);
+        Channel channel = EntityUtils.channel();
+        List<String> recipients = channel.getRecipients();
         int id = 1;
         channel.setId(id);
 
@@ -139,7 +132,7 @@ class ChannelControllerTest {
                 .jsonPath("$.recipients[0]").isEqualTo(recipients.get(0))
                 .jsonPath("$.recipients[1]").isEqualTo(recipients.get(1));
 
-        Mockito.verify(channelService, times(1)).getChannelById(id);
+        verify(channelService, times(1)).getChannelById(id);
     }
 
     @Test
@@ -154,20 +147,12 @@ class ChannelControllerTest {
                 .expectStatus().isNotFound()
                 .expectBody().isEmpty();
 
-        Mockito.verify(channelService, times(1)).getChannelById(id);
+        verify(channelService, times(1)).getChannelById(id);
     }
 
     @Test
     void should_get_channels() {
-        List<String> recipients = Arrays.asList("ab@gmail.com", "abc@gmail.com");
-        ChannelCreationDto channelCreationDto1 = new ChannelCreationDto("A", "channel A", recipients);
-        Channel channel1 = new Channel(channelCreationDto1);
-        channel1.setId(1);
-        ChannelCreationDto channelCreationDto2 = new ChannelCreationDto("B", "channel B", recipients);
-        Channel channel2 = new Channel(channelCreationDto2);
-        channel2.setId(2);
-
-        List<Channel> channels = Arrays.asList(channel1, channel2);
+        List<Channel> channels = EntityUtils.channels();
         when(channelService.getChannels()).thenReturn(channels);
 
         webClient.get()
@@ -180,7 +165,7 @@ class ChannelControllerTest {
             MatcherAssert.assertThat(elements, Matchers.hasItem(channels.get(1)));
         });
 
-        Mockito.verify(channelService, times(1)).getChannels();
+        verify(channelService, times(1)).getChannels();
     }
 
 }

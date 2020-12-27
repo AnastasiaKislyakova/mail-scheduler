@@ -19,11 +19,14 @@ import ru.kislyakova.anastasia.scheduler.entity.Channel;
 import ru.kislyakova.anastasia.scheduler.entity.Mailing;
 import ru.kislyakova.anastasia.scheduler.service.ChannelService;
 import ru.kislyakova.anastasia.scheduler.service.MailingService;
+import ru.kislyakova.anastasia.scheduler.utils.EntityUtils;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -39,7 +42,7 @@ class MailingControllerTest {
 
     @Test
     void should_create_mailing() {
-        MailingCreationDto mailingDto = new MailingCreationDto(1, "Subject A", "Text A");
+        MailingCreationDto mailingDto = EntityUtils.mailingCreationDto();
         Mailing mailing = new Mailing(mailingDto);
         mailing.setId(1);
 
@@ -52,13 +55,12 @@ class MailingControllerTest {
                 .exchange()
                 .expectStatus().isCreated();
 
-        Mockito.verify(mailingService, times(1)).createMailing(mailingDto);
+        verify(mailingService, times(1)).createMailing(mailingDto);
     }
 
     @Test
     void should_send_mailing() {
-        MailingCreationDto mailingDto = new MailingCreationDto(1, "Subject A", "Text A");
-        Mailing mailing = new Mailing(mailingDto);
+        Mailing mailing = EntityUtils.mailing();
         int id = 1;
         mailing.setId(id);
         when(mailingService.sendMailing(id)).thenReturn(mailing);
@@ -74,7 +76,7 @@ class MailingControllerTest {
                 .jsonPath("$.text").isEqualTo(mailing.getText())
                 .jsonPath("$.attempt").isEqualTo(mailing.getAttempt());
 
-        Mockito.verify(mailingService, times(1)).sendMailing(id);
+        verify(mailingService, times(1)).sendMailing(id);
     }
 
     @Test
@@ -88,13 +90,12 @@ class MailingControllerTest {
                 .exchange()
                 .expectStatus().isNotFound();
 
-        Mockito.verify(mailingService, times(1)).sendMailing(id);
+        verify(mailingService, times(1)).sendMailing(id);
     }
 
     @Test
     void should_get_mailing_by_id() {
-        MailingCreationDto mailingDto = new MailingCreationDto(1, "Subject A", "Text A");
-        Mailing mailing = new Mailing(mailingDto);
+        Mailing mailing = EntityUtils.mailing();
         int id = 1;
         mailing.setId(id);
 
@@ -111,7 +112,7 @@ class MailingControllerTest {
                 .jsonPath("$.text").isEqualTo(mailing.getText())
                 .jsonPath("$.attempt").isEqualTo(mailing.getAttempt());
 
-        Mockito.verify(mailingService, times(1)).getMailingById(id);
+        verify(mailingService, times(1)).getMailingById(id);
     }
 
     @Test
@@ -125,20 +126,12 @@ class MailingControllerTest {
                 .exchange()
                 .expectStatus().isNotFound();
 
-        Mockito.verify(mailingService, times(1)).getMailingById(id);
+        verify(mailingService, times(1)).getMailingById(id);
     }
 
     @Test
     void should_get_mailings() {
-        MailingCreationDto mailingDto1 = new MailingCreationDto(1, "Subject A", "Text A");
-        Mailing mailing1 = new Mailing(mailingDto1);
-        mailing1.setId(1);
-
-        MailingCreationDto mailingDto2 = new MailingCreationDto(1, "Subject B", "Text B");
-        Mailing mailing2 = new Mailing(mailingDto2);
-        mailing2.setId(2);
-
-        List<Mailing> mailings = Arrays.asList(mailing1, mailing2);
+        List<Mailing> mailings = EntityUtils.mailings();
         when(mailingService.getMailings()).thenReturn(mailings);
 
         webClient.get()
@@ -151,6 +144,6 @@ class MailingControllerTest {
             MatcherAssert.assertThat(elements, Matchers.hasItem(mailings.get(1)));
         });
 
-        Mockito.verify(mailingService, times(1)).getMailings();
+        verify(mailingService, times(1)).getMailings();
     }
 }

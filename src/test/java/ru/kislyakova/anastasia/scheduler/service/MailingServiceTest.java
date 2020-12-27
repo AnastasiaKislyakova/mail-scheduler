@@ -14,10 +14,11 @@ import ru.kislyakova.anastasia.scheduler.repository.MailingRepository;
 import ru.kislyakova.anastasia.scheduler.service.impl.MailingServiceImpl;
 import ru.kislyakova.anastasia.scheduler.utils.EntityUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -30,7 +31,7 @@ public class MailingServiceTest {
 
     @Test
     void should_create_mailing() {
-        MailingCreationDto mailingCreationDto = new MailingCreationDto(1, "Subject A", "Text A");
+        MailingCreationDto mailingCreationDto = EntityUtils.mailingCreationDto();
         Mailing saved = new Mailing(mailingCreationDto);
         Mailing expected = new Mailing(mailingCreationDto);
         expected.setId(1);
@@ -42,28 +43,28 @@ public class MailingServiceTest {
 
         Mailing actual = mailingService.createMailing(mailingCreationDto);
 
-        Mockito.verify(channelService, times(1)).getChannelById(1);
-        Mockito.verify(mailingRepository, times(1)).save(saved);
-        Assertions.assertEquals(expected, actual);
-        Assertions.assertNotEquals(saved.getId(), actual.getId());
+        verify(channelService, times(1)).getChannelById(1);
+        verify(mailingRepository, times(1)).save(saved);
+        assertEquals(expected, actual);
+        assertNotEquals(saved.getId(), actual.getId());
     }
 
     @Test
     void should_not_create_mailing_with_not_found_channel() {
-        MailingCreationDto mailingCreationDto = new MailingCreationDto(1, "Subject A", "Text A");
+        MailingCreationDto mailingCreationDto = EntityUtils.mailingCreationDto();
         Mailing saved = new Mailing(mailingCreationDto);
 
         when(channelService.getChannelById(1)).thenReturn(null);
 
         Assertions.assertThrows(ChannelNotFoundException.class, () -> mailingService.createMailing(mailingCreationDto));
 
-        Mockito.verify(channelService, times(1)).getChannelById(1);
-        Mockito.verify(mailingRepository, times(0)).save(saved);
+        verify(channelService, times(1)).getChannelById(1);
+        verify(mailingRepository, times(0)).save(saved);
     }
 
     @Test
     void should_send_mailing() {
-        MailingCreationDto mailingCreationDto = new MailingCreationDto(1, "Subject A", "Text A");
+        MailingCreationDto mailingCreationDto = EntityUtils.mailingCreationDto();
         Channel channel = EntityUtils.channel();
         channel.setId(1);
 
@@ -95,12 +96,12 @@ public class MailingServiceTest {
 
         Mailing actual = mailingService.sendMailing(1);
 
-        Mockito.verify(mailingRepository, times(1)).findById(1);
-        Mockito.verify(channelService, times(1)).getChannelById(1);
-        Mockito.verify(emailService, times(1)).sendEmail(emailCreationDto1);
-        Mockito.verify(emailService, times(1)).sendEmail(emailCreationDto2);
-        Mockito.verify(mailingRepository, times(1)).save(expected);
-        Assertions.assertEquals(expected, actual);
+        verify(mailingRepository, times(1)).findById(1);
+        verify(channelService, times(1)).getChannelById(1);
+        verify(emailService, times(1)).sendEmail(emailCreationDto1);
+        verify(emailService, times(1)).sendEmail(emailCreationDto2);
+        verify(mailingRepository, times(1)).save(expected);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -109,38 +110,36 @@ public class MailingServiceTest {
 
         Mailing actual = mailingService.sendMailing(1);
 
-        Mockito.verify(mailingRepository, times(1)).findById(1);
-        Assertions.assertNull(actual);
+        verify(mailingRepository, times(1)).findById(1);
+        assertNull(actual);
     }
 
     @Test
     void should_not_send_mailing_with_not_found_channel() {
-        MailingCreationDto mailingCreationDto = new MailingCreationDto(1, "Subject A", "Text A");
-        Mailing mailing = new Mailing(mailingCreationDto);
+        Mailing mailing = EntityUtils.mailing();
         mailing.setId(1);
         mailing.setAttempt(0);
 
         when(mailingRepository.findById(1)).thenReturn(Optional.of(mailing));
         when(channelService.getChannelById(1)).thenReturn(null);
 
-        Assertions.assertThrows(ChannelNotFoundException.class, () -> mailingService.sendMailing(1));
+        assertThrows(ChannelNotFoundException.class, () -> mailingService.sendMailing(1));
 
-        Mockito.verify(mailingRepository, times(1)).findById(1);
-        Mockito.verify(channelService, times(1)).getChannelById(1);
+        verify(mailingRepository, times(1)).findById(1);
+        verify(channelService, times(1)).getChannelById(1);
     }
 
     @Test
     void should_get_mailing_by_id() {
-        MailingCreationDto mailingCreationDto = new MailingCreationDto(1, "Subject A", "Text A");
-        Mailing expected = new Mailing(mailingCreationDto);
+        Mailing expected = EntityUtils.mailing();
         expected.setId(1);
 
         when(mailingRepository.findById(1)).thenReturn(Optional.of(expected));
 
         Mailing actual = mailingService.getMailingById(1);
 
-        Mockito.verify(mailingRepository, times(1)).findById(1);
-        Assertions.assertEquals(expected, actual);
+        verify(mailingRepository, times(1)).findById(1);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -155,19 +154,13 @@ public class MailingServiceTest {
 
     @Test
     void should_get_mailings() {
-        MailingCreationDto mailingCreationDto1 = new MailingCreationDto(1, "Subject A", "Text A");
-        Mailing mailing1 = new Mailing(mailingCreationDto1);
-        mailing1.setId(1);
-        MailingCreationDto mailingCreationDto2 = new MailingCreationDto(2, "Subject B", "Text B");
-        Mailing mailing2 = new Mailing(mailingCreationDto2);
-        mailing2.setId(2);
-        List<Mailing> expected = Arrays.asList(mailing1, mailing2);
+        List<Mailing> expected = EntityUtils.mailings();
 
         when(mailingRepository.findAll()).thenReturn(expected);
 
         List<Mailing> actual = mailingService.getMailings();
 
-        Mockito.verify(mailingRepository, times(1)).findAll();
-        Assertions.assertEquals(expected, actual);
+        verify(mailingRepository, times(1)).findAll();
+        assertEquals(expected, actual);
     }
 }

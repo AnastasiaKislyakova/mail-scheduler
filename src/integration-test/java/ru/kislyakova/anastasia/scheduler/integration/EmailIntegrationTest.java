@@ -1,45 +1,60 @@
 package ru.kislyakova.anastasia.scheduler.integration;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kislyakova.anastasia.scheduler.controller.EmailController;
 import ru.kislyakova.anastasia.scheduler.dto.EmailCreationDto;
 import ru.kislyakova.anastasia.scheduler.entity.Email;
 import ru.kislyakova.anastasia.scheduler.service.EmailService;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-@WebFluxTest(EmailController.class)
-@ExtendWith(SpringExtension.class)
-class EmailControllerTest {
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("integration-test")
+class EmailIntegrationTest {
     @Autowired
     private WebTestClient webClient;
 
-    @MockBean
+    @Autowired
     private EmailService emailService;
 
+    @RegisterExtension
+    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+            .withConfiguration(GreenMailConfiguration.aConfig().withUser("test", "test"))
+            .withPerMethodLifecycle(false);
+
     @Test
-    void should_create_and_send_email() {
+    void should_create_and_send_email() throws MessagingException {
         EmailCreationDto emailDto = new EmailCreationDto(1, 1, "ab@gmail.com",
                 "Subject A", "Text A");
-        Email email = new Email(emailDto);
-        email.setId(1);
-        when(emailService.sendEmail(emailDto)).thenReturn(email);
 
         webClient.post()
                 .uri("/api/emails")
@@ -48,18 +63,19 @@ class EmailControllerTest {
                 .exchange()
                 .expectStatus().isOk();
 
-        Mockito.verify(emailService, times(1)).sendEmail(emailDto);
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        assertEquals("Subject A", receivedMessage.getSubject());
+        assertEquals("Text A", GreenMailUtil.getBody(receivedMessage));
+        assertEquals(1, receivedMessage.getAllRecipients().length);
+        assertEquals("ab@gmail.com", receivedMessage.getAllRecipients()[0].toString());
     }
 
     @Test
     void should_get_email_by_id() {
         EmailCreationDto emailDto = new EmailCreationDto(1, 1, "ab@gmail.com",
                 "Subject A", "Text A");
-        Email email = new Email(emailDto);
+        Email email = emailService.sendEmail(emailDto);
         int id = 1;
-        email.setId(id);
-
-        when(emailService.getEmailById(id)).thenReturn(email);
 
         webClient.get()
                 .uri("/api/emails/{emailId}", id)
@@ -71,40 +87,31 @@ class EmailControllerTest {
                 .jsonPath("$.mailingAttempt").isEqualTo(email.getMailingAttempt())
                 .jsonPath("$.recipient").isEqualTo(email.getRecipient())
                 .jsonPath("$.subject").isEqualTo(email.getSubject())
-                .jsonPath("$.Text").isEqualTo(email.getText());
-
-        Mockito.verify(emailService, times(1)).getEmailById(id);
+                .jsonPath("$.text").isEqualTo(email.getText());
     }
 
     @Test
     void should_not_find_email_by_id() {
         int id = 2;
 
-        when(emailService.getEmailById(id)).thenReturn(null);
-
         webClient.get()
                 .uri("/api/emails/{emailId}", id)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody().isEmpty();
-
-        Mockito.verify(emailService, times(1)).getEmailById(id);
     }
 
     @Test
     void should_get_emails() {
         EmailCreationDto emailDto1 = new EmailCreationDto(1, 1, "ab@gmail.com",
                 "Subject A", "Text A");
-        Email email1 = new Email(emailDto1);
-        email1.setId(1);
+        Email email1 = emailService.sendEmail(emailDto1);
 
         EmailCreationDto emailDto2 = new EmailCreationDto(1, 1, "abc@gmail.com",
                 "Subject A", "Text A");
-        Email email2 = new Email(emailDto2);
-        email1.setId(2);
+        Email email2 = emailService.sendEmail(emailDto2);
 
         List<Email> emails = Arrays.asList(email1, email2);
-        when(emailService.getEmails()).thenReturn(emails);
 
         webClient.get()
                 .uri("/api/emails")
@@ -115,8 +122,6 @@ class EmailControllerTest {
             MatcherAssert.assertThat(elements, Matchers.hasItem(emails.get(0)));
             MatcherAssert.assertThat(elements, Matchers.hasItem(emails.get(1)));
         });
-
-        Mockito.verify(emailService, times(1)).getEmails();
     }
 
 

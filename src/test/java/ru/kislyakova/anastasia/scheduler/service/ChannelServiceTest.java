@@ -1,6 +1,5 @@
 package ru.kislyakova.anastasia.scheduler.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +14,8 @@ import ru.kislyakova.anastasia.scheduler.utils.EntityUtils;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -36,9 +37,9 @@ public class ChannelServiceTest {
 
         Channel actual = channelService.createChannel(channelDto);
 
-        Mockito.verify(channelRepository, times(1)).save(saved);
-        Assertions.assertEquals(returned, actual);
-        Assertions.assertNotEquals(saved.getId(), actual.getId());
+        verify(channelRepository, times(1)).save(saved);
+        assertEquals(returned, actual);
+        assertNotEquals(saved.getId(), actual.getId());
     }
 
     @Test
@@ -48,9 +49,9 @@ public class ChannelServiceTest {
 
         when(channelRepository.save(saved)).thenThrow(DataIntegrityViolationException.class);
 
-        Assertions.assertThrows(DuplicateChannelException.class, () -> channelService.createChannel(channelDto));
+        assertThrows(DuplicateChannelException.class, () -> channelService.createChannel(channelDto));
 
-        Mockito.verify(channelRepository, times(1)).save(saved);
+        verify(channelRepository, times(1)).save(saved);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class ChannelServiceTest {
         ChannelUpdatingDto channelUpdatingDto = EntityUtils.channelUpdatingDto();
         Channel original = EntityUtils.channel();
         original.setId(1);
-        Channel updated = original;
+        Channel updated = EntityUtils.channel();;
         updated.setDescription(channelUpdatingDto.getDescription());
         updated.setRecipients(channelUpdatingDto.getRecipients());
         updated.setId(1);
@@ -68,9 +69,9 @@ public class ChannelServiceTest {
 
         Channel actual = channelService.updateChannel(1, channelUpdatingDto);
 
-        Mockito.verify(channelRepository, times(1)).findById(1);
-        Mockito.verify(channelRepository, times(1)).save(updated);
-        Assertions.assertEquals(updated, actual);
+        verify(channelRepository, times(1)).findById(1);
+        verify(channelRepository, times(1)).save(updated);
+        assertEquals(updated, actual);
     }
 
     @Test
@@ -85,9 +86,9 @@ public class ChannelServiceTest {
 
         Channel actual = channelService.updateChannel(2, channelUpdatingDto);
 
-        Mockito.verify(channelRepository, times(1)).findById(2);
-        Mockito.verify(channelRepository, times(0)).save(updated);
-        Assertions.assertNull(actual);
+        verify(channelRepository, times(1)).findById(2);
+        verify(channelRepository, times(0)).save(updated);
+        assertNull(actual);
     }
 
     @Test
@@ -99,8 +100,8 @@ public class ChannelServiceTest {
 
         Channel actual = channelService.getChannelById(1);
 
-        Mockito.verify(channelRepository, times(1)).findById(1);
-        Assertions.assertEquals(saved, actual);
+        verify(channelRepository, times(1)).findById(1);
+        assertEquals(saved, actual);
     }
 
     @Test
@@ -110,7 +111,7 @@ public class ChannelServiceTest {
         Channel actual = channelService.getChannelById(1);
 
         Mockito.verify(channelRepository, times(1)).findById(1);
-        Assertions.assertNull(actual);
+        assertNull(actual);
     }
 
     @Test
@@ -121,7 +122,7 @@ public class ChannelServiceTest {
 
         List<Channel> actual = channelService.getChannels();
 
-        Mockito.verify(channelRepository, times(1)).findAll();
-        Assertions.assertEquals(channels, actual);
+        verify(channelRepository, times(1)).findAll();
+        assertEquals(channels, actual);
     }
 }

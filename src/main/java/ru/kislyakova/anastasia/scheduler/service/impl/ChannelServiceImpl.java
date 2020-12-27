@@ -1,8 +1,5 @@
 package ru.kislyakova.anastasia.scheduler.service.impl;
 
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +24,6 @@ public class ChannelServiceImpl implements ChannelService {
         this.channelRepository = channelRepository;
     }
 
-    @Cacheable(value = "channels")
     @Override
     public Channel createChannel(ChannelCreationDto channelCreationDto) {
         Channel channel = new Channel(channelCreationDto);
@@ -47,9 +43,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Cacheable(value = "channels")
     @Override
     public Channel getChannelById(int channelId) {
-        Channel channel = channelRepository.findById(channelId).orElse(null);
-
-        return channel;
+        return channelRepository.findById(channelId).orElse(null);
     }
 
     @CachePut(value = "channels", key = "#channelId")

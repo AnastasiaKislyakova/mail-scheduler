@@ -7,12 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelCreationDto;
 import ru.kislyakova.anastasia.scheduler.dto.ChannelUpdatingDto;
@@ -23,28 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 
 @Testcontainers
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("integration-test")
 class ChannelIntegrationTest {
-
-    @Container
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:latest")
-            .withDatabaseName("test-db")
-            .withUsername("postgres")
-            .withPassword("password");
-
-    @DynamicPropertySource
-    static void postgresqlProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-    }
-
-    @Test
-    public void contextLoads() {
-    }
-
     @Autowired
     private WebTestClient webClient;
 
@@ -55,8 +33,6 @@ class ChannelIntegrationTest {
     void should_create_channel() {
         ChannelCreationDto channelDto = new ChannelCreationDto("A", "channel A",
                 Arrays.asList("ab@gmail.com", "abc@gmail.com"));
-        Channel channel = new Channel(channelDto);
-        channel.setId(1);
 
         webClient.post()
                 .uri("/api/channels")
@@ -70,8 +46,7 @@ class ChannelIntegrationTest {
     void should_not_create_channel_with_existing_name() throws Exception {
         ChannelCreationDto channelDto = new ChannelCreationDto("A", "channel A",
                 Arrays.asList("ab@gmail.com", "abc@gmail.com"));
-        Channel channel = new Channel(channelDto);
-        channelService.createChannel(channelDto);
+        Channel channel = channelService.createChannel(channelDto);
 
         webClient.post()
                 .uri("/api/channels")
@@ -84,7 +59,7 @@ class ChannelIntegrationTest {
     @Test
     void should_update_channel() {
         ChannelUpdatingDto channelDto = new ChannelUpdatingDto("channel A",
-                Arrays.asList("ab@gmail.com", "abc@gmail.com"));
+                Arrays.asList("ab@gmail.com", "abc@gmail.com", "abcd@gmail.com"));
         ChannelCreationDto channelCreationDto = new ChannelCreationDto("A", "channel A",
                 Arrays.asList("ab@gmail.com", "abc@gmail.com"));
         channelService.createChannel(channelCreationDto);
@@ -147,13 +122,9 @@ class ChannelIntegrationTest {
     void should_get_channels() {
         List<String> recipients = Arrays.asList("ab@gmail.com", "abc@gmail.com");
         ChannelCreationDto channelCreationDto1 = new ChannelCreationDto("A", "channel A", recipients);
-        Channel channel1 = new Channel(channelCreationDto1);
-        channel1.setId(1);
-        channelService.createChannel(channelCreationDto1);
+        Channel channel1 = channelService.createChannel(channelCreationDto1);
         ChannelCreationDto channelCreationDto2 = new ChannelCreationDto("B", "channel B", recipients);
-        Channel channel2 = new Channel(channelCreationDto2);
-        channel2.setId(2);
-        channelService.createChannel(channelCreationDto2);
+        Channel channel2 = channelService.createChannel(channelCreationDto2);
 
         List<Channel> channels = Arrays.asList(channel1, channel2);
 
